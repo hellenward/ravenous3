@@ -1,0 +1,338 @@
+diff --git a/public/favicon.ico b/public/favicon.ico
+index a11777c..cbcf212 100644
+Binary files a/public/favicon.ico and b/public/favicon.ico differ
+diff --git a/public/index.html b/public/index.html
+index dd1ccfd..1be7d5d 100644
+--- a/public/index.html
++++ b/public/index.html
+@@ -3,6 +3,9 @@
+   <head>
+     <meta charset="utf-8" />
+     <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico" />
++    <link rel="stylesheet" href="./reset.css" type="text/css" />
++    <link href="https://fonts.googleapis.com/css?family=Work+Sans:300,500,600" rel="stylesheet">
++    <link href="https://fonts.googleapis.com/css?family=Poppins:600" rel="stylesheet">
+     <meta name="viewport" content="width=device-width, initial-scale=1" />
+     <meta name="theme-color" content="#000000" />
+     <!--
+diff --git a/public/reset.css b/public/reset.css
+new file mode 100644
+index 0000000..45bd74b
+--- /dev/null
++++ b/public/reset.css
+@@ -0,0 +1,43 @@
++html, body, div, span, applet, object, iframe,
++h1, h2, h3, h4, h5, h6, p, blockquote, pre,
++a, abbr, acronym, address, big, cite, code,
++del, dfn, em, img, ins, kbd, q, s, samp,
++small, strike, strong, sub, sup, tt, var,
++b, u, i, center,
++dl, dt, dd, ol, ul, li,
++fieldset, form, label, legend,
++table, caption, tbody, tfoot, thead, tr, th, td,
++article, aside, canvas, details, embed,
++figure, figcaption, footer, header, hgroup,
++menu, nav, output, ruby, section, summary,
++time, mark, audio, video {
++  margin: 0;
++  padding: 0;
++  border: 0;
++  font-size: 100%;
++  font: inherit;
++  vertical-align: baseline;
++}
++/* HTML5 display-role reset for older browsers */
++article, aside, details, figcaption, figure,
++footer, header, hgroup, menu, nav, section {
++  display: block;
++}
++body {
++  line-height: 1;
++}
++ol, ul {
++  list-style: none;
++}
++blockquote, q {
++  quotes: none;
++}
++blockquote:before, blockquote:after,
++q:before, q:after {
++  content: '';
++  content: none;
++}
++table {
++  border-collapse: collapse;
++  border-spacing: 0;
++}
+diff --git a/src/App.css b/src/App.css
+index b41d297..0316768 100644
+--- a/src/App.css
++++ b/src/App.css
+@@ -1,33 +1,44 @@
+-.App {
+-  text-align: center;
++/* Universal Styles */
++
++html {
++  font-size: 18px;
+ }
+ 
+-.App-logo {
+-  animation: App-logo-spin infinite 20s linear;
+-  height: 40vmin;
+-  pointer-events: none;
++@media only screen and (max-width: 560px) {
++  html {
++    font-size: 15px;
++  }
+ }
+ 
+-.App-header {
+-  background-color: #282c34;
+-  min-height: 100vh;
++input:focus {
++  outline: none;
++}
++
++/* Reusable Component - Image Container */
++
++.image-container {
+   display: flex;
+   flex-direction: column;
+-  align-items: center;
+   justify-content: center;
+-  font-size: calc(10px + 2vmin);
+-  color: white;
++  overflow: hidden;
++  background: #000;
+ }
+ 
+-.App-link {
+-  color: #61dafb;
++.image-container img {
++  width: 100%;
+ }
+ 
+-@keyframes App-logo-spin {
+-  from {
+-    transform: rotate(0deg);
+-  }
+-  to {
+-    transform: rotate(360deg);
+-  }
++/* App Styles */
++
++.App {
++  font-family: 'Work Sans', sans-serif;
++}
++
++h1 {
++  padding: .66rem 0;
++  text-align: center;
++  background-color: #cca353;
++  font-family: Poppins, sans-serif;
++  font-size: 1.8rem;
++  color: #fff;
+ }
+diff --git a/src/App.js b/src/App.js
+index ce9cbd2..6b72762 100644
+--- a/src/App.js
++++ b/src/App.js
+@@ -1,26 +1,40 @@
+ import React from 'react';
+ import logo from './logo.svg';
+ import './App.css';
++import BusinessList from './components/BusinessList/BusinessList.js';
++import SearchBar from './components/SearchBar/SearchBar.js';
+ 
+-function App() {
+-  return (
+-    <div className="App">
+-      <header className="App-header">
+-        <img src={logo} className="App-logo" alt="logo" />
+-        <p>
+-          Edit <code>src/App.js</code> and save to reload.
+-        </p>
+-        <a
+-          className="App-link"
+-          href="https://reactjs.org"
+-          target="_blank"
+-          rel="noopener noreferrer"
+-        >
+-          Learn React
+-        </a>
+-      </header>
+-    </div>
+-  );
++const business = {
++  imageSrc: 'https://s3.amazonaws.com/codecademy-content/programs/react/ravenous/pizza.jpg',
++  name: 'MarginOtto Pizzeria',
++  address: '1010 Paddington Way',
++  city: 'Flavortown',
++  state: 'NY',
++  zipCode: '10101',
++  category: 'Italian',
++  rating: 4.5,
++  reviewCount: 90
++}
++
++const businesses = [
++  business,
++  business,
++  business,
++  business,
++  business,
++  business
++];
++
++class App extends React.Component {
++  render() {
++    return (
++      <div className="App">
++        <h1>ravenous</h1>
++        <SearchBar />
++        <BusinessList business={businesses}/>
++      </div>
++    );
++  }
+ }
+ 
+ export default App;
+diff --git a/src/components/Business/Business.css b/src/components/Business/Business.css
+new file mode 100644
+index 0000000..002d47d
+--- /dev/null
++++ b/src/components/Business/Business.css
+@@ -0,0 +1,52 @@
++.Business {
++  display: flex;
++  flex-direction: column;
++  justify-content: space-between;
++  width: 16.66rem;
++  margin: 0 .5rem 2.3rem .5rem;
++}
++
++.Business .image-container {
++  height: 16.66rem;
++  margin-bottom: 1rem;
++}
++
++.Business h2 {
++  margin-bottom: .5rem;
++  font-size: 1.2rem;
++  font-weight: 600;
++}
++
++.Business-information {
++  display: flex;
++  justify-content: space-between;
++}
++
++.Business-information p {
++  font-size: .88rem;
++  font-weight: 300;
++  line-height: 1rem;
++}
++
++.Business-address {
++  display: flex;
++  flex-direction: column;
++  justify-content: space-between;
++}
++
++.Business-reviews {
++  display: flex;
++  flex-direction: column;
++  justify-content: space-between;
++  text-align: right;
++}
++
++.Business-reviews h3 {
++  color: #CCA353;
++  font-weight: 600;
++}
++
++.Business-reviews .rating {
++  font-size: .88rem;
++  line-height: 1rem;
++}
+diff --git a/src/components/Business/Business.js b/src/components/Business/Business.js
+new file mode 100644
+index 0000000..8606add
+--- /dev/null
++++ b/src/components/Business/Business.js
+@@ -0,0 +1,29 @@
++import React from 'react';
++import './Business.css';
++
++class Business extends React.Component {
++  render() {
++      return (
++        <div className="Business">
++          <div className="image-container">
++            <img src={this.props.business.imageSrc} alt=''/>
++          </div>
++          <h2>{this.props.business.name}</h2>
++          <div className="Business-information">
++          <div className="Business-address">
++            <p>{this.props.business.address}</p>
++            <p>{this.props.business.city}</p>
++            <p>{this.props.business.zipCode}</p>
++          </div>
++          <div className="Business-reviews">
++            <h3>{this.props.business.category}</h3>
++            <h3 className="rating">{this.props.business.rating}</h3>
++            <p>{this.props.business.reviewCount}</p>
++          </div>
++        </div>
++      </div>
++    )
++  }
++}
++
++export default Business;
+diff --git a/src/components/BusinessList/BusinessList.css b/src/components/BusinessList/BusinessList.css
+new file mode 100644
+index 0000000..f77f7c2
+--- /dev/null
++++ b/src/components/BusinessList/BusinessList.css
+@@ -0,0 +1,6 @@
++.BusinessList {
++  display: flex;
++  justify-content: space-around;
++  flex-wrap: wrap;
++  margin: 4.4rem 10%;
++}
+diff --git a/src/components/BusinessList/BusinessList.js b/src/components/BusinessList/BusinessList.js
+new file mode 100644
+index 0000000..9dbe7fa
+--- /dev/null
++++ b/src/components/BusinessList/BusinessList.js
+@@ -0,0 +1,20 @@
++import React from 'react';
++import './BusinessList.css';
++import Business from '../Business/Business';
++import App from '../../App.js';
++
++class BusinessList extends React.Component {
++  render() {
++    return (
++      <div className="BusinessList">
++        {
++          this.props.businesses.map(function(business) {
++            return <Business business={business} />;
++          })
++        }
++      </div>
++    );
++  }
++};
++
++export default BusinessList;
+diff --git a/src/components/SearchBar b/src/components/SearchBar
+new file mode 160000
+index 0000000..a27a1fe
+--- /dev/null
++++ b/src/components/SearchBar
+@@ -0,0 +1 @@
++Subproject commit a27a1fede7b820b5239cacbfcf9b2a4d393b8fe9
